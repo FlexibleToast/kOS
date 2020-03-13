@@ -1,8 +1,10 @@
 set TargetOrbit to 100000.
-set Radial to 90.
-set TurnSpeed to 50.
-set OrbitTurn to 30000.
-set FinalTurn to 60000.
+set Radial to          90.
+set Roll to            90.
+set StartTurnAlt to  5000.
+set EndTurnAlt to   70000.
+set StartTurnAngle to  90.
+set EndTurnAngle to     5.
 
 function main {
   clearscreen.
@@ -28,19 +30,18 @@ function launchCraft{
 
 function gravityTurn{
   print "Apoapsis:".
+  // Locking the pitch to the calculation here to make as readible as possible
+  lock pitch to round((StartTurnAngle - (((apoapsis - StartTurnAlt)/(EndTurnAlt - StartTurnAlt))
+                      *(StartTurnAngle - EndTurnAngle)+StartTurnAngle)),0).
   until apoapsis > TargetOrbit {
     print round(apoapsis,0) at (10,2).
     autoStage().
-    if ship:airspeed < TurnSpeed {
-      lock steering to up.
-    }else if ship:airspeed > TurnSpeed and apoapsis < 10000 {
-      lock steering to heading(Radial, 85).
-    }else if apoapsis < OrbitTurn {
-      lock steering to srfprograde.
-    }else if apoapsis < FinalTurn {
-      lock steering to prograde.
-    }else{
-      lock steering to heading(Radial, 5).
+    if apoapsis < StartTurnAlt {
+      lock steering to heading(Radial, 90, Roll).
+    } else if apoapsis < EndTurnAlt {
+      lock steering to heading(Radial, pitch, Roll)
+    } else {
+      lock steering to heading(Radial, EndTurnAngle, Roll).
     }
   }
   print "Target orbit apoapsis reached".
