@@ -1,6 +1,6 @@
 set TargetOrbit to 100000.
 set Radial to          90.
-set Roll to            90.
+set Roll to           180.
 set StartTurnAlt to  5000.
 set EndTurnAlt to   70000.
 set StartTurnAngle to  90.
@@ -32,14 +32,14 @@ function gravityTurn{
   print "Apoapsis:".
   // Locking the pitch to the calculation here to make as readible as possible
   lock pitch to round((StartTurnAngle - (((apoapsis - StartTurnAlt)/(EndTurnAlt - StartTurnAlt))
-                      *(StartTurnAngle - EndTurnAngle)+StartTurnAngle)),0).
+                      *(StartTurnAngle - EndTurnAngle))),0).
   until apoapsis > TargetOrbit {
     print round(apoapsis,0) at (10,2).
     autoStage().
     if apoapsis < StartTurnAlt {
       lock steering to heading(Radial, 90, Roll).
     } else if apoapsis < EndTurnAlt {
-      lock steering to heading(Radial, pitch, Roll)
+      lock steering to heading(Radial, pitch, Roll).
     } else {
       lock steering to heading(Radial, EndTurnAngle, Roll).
     }
@@ -48,13 +48,13 @@ function gravityTurn{
 }
 
 function circularizeOrbit{
-  wait until eta:apoapsis < 30.
   sas off.
+  wait until eta:apoapsis < 30.
   until eta:apoapsis < 15 { lock steering to heading(Radial, 0) .}
   print "Periapsis:".
   set throttle to 1.
   until periapsis > (TargetOrbit - TargetOrbit*.05) {
-    print round(periapsis,0) at (0,2).
+    print round(periapsis,0) at (11,1).
     autoStage().
     lock steering to heading(Radial, 0).
   }
