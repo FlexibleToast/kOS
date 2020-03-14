@@ -1,2 +1,2 @@
 core:part:getmodule("kOSProcessor"):doevent("Open Terminal").
-runpath("0:/launchComSat.ks").
+runoncepath("0:/launchSat.ks", 260000, 100000, 1000).

@@ -1,2 +1,2 @@
 core:part:getmodule("kOSProcessor"):doevent("Open Terminal").
-runpath("0:/launchOrbit.ks").
+runoncepath("0:/launchOrbit.ks").

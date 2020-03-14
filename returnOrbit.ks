@@ -1,12 +1,12 @@
-set EntrancePeriapsis to 45000.
-set ArmChute to          10000.
+Declare Parameter
+EntrancePeriapsis is 45000,
+ArmChute is          10000.
 
 function main {
   clearscreen.
   print "Returning from orbit.".
   sas off.
   decelerateCraft().
-  print "Reached desired entrance periapsis.".
   landCraft().
 }
 
@@ -30,12 +30,22 @@ function decelerateCraft {
     wait 1.
     list engines in craftEngines.
   }
+  print "Reached desired entrance periapsis.".
+  print "Coasting to atomosphere.".
+  until ship:altitude < 70000 { set warp to 4. }
+  set warp to 0.
 }
 
 function landCraft {
-  until alt:radar < ArmChute { lock steering to srfretrograde. }
+  until alt:radar < ArmChute {
+    lock steering to srfretrograde.
+    wait 1.
+  }
   print "Deploying chutes.".
-  chutes on.
+  until stage:number = 0 {
+    wait stage:ready.
+    stage.
+  }
 }
 
 main().

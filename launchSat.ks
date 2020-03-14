@@ -54,6 +54,10 @@ function gravityTurn{
 }
 
 function circularizeOrbit{
+  // Ditch excess ascent stages not needed for a satellite
+  until stage:number = 0 {
+    stageCraft().
+  }
   if ship:altitude < 70000 {
     until ship:altitude > 70000 { lock steering to srfprograde. }
   }
