@@ -1,3 +1,8 @@
+//
+// Auther: Joseph McDade
+// GitHub: https://github.com/FlexibleToast/kOS
+//
+
 Declare Parameter
 EntrancePeriapsis is 45000,
 ArmChute is          10000.
@@ -8,44 +13,50 @@ function main {
   sas off.
   decelerateCraft().
   landCraft().
+  shutdownCraft().
 }
 
 function decelerateCraft {
-  set steering to retrograde.
-  wait 3.
+  lock steering to retrograde.
+  wait 5.
   set throttle to 1.
   print "Periapsis:".
   until periapsis < EntrancePeriapsis {
     print round(periapsis,0) at (11,1).
-    lock steering to retrograde.
   }
+  print "Reached desired entrance periapsis.".
   set throttle to 0.
+  //Prepare craft for reentry
   panels off.
   wait 5.
-  // Ditch remaining engines
   list engines in craftEngines.
-  until craftEngines:length < 1 {
+  until craftEngines:length = 0 {
+    // Ditch remaining engines
     wait until stage:ready.
     stage.
     wait 1.
     list engines in craftEngines.
   }
-  print "Reached desired entrance periapsis.".
   print "Coasting to atomosphere.".
-  until ship:altitude < 70000 { set warp to 4. }
-  set warp to 0.
+  if ship:altitude > 70000 {
+    set warp to 4.
+  }
 }
 
 function landCraft {
-  until alt:radar < ArmChute {
-    lock steering to srfretrograde.
-    wait 1.
-  }
+  lock steering to srfretrograde.
+  wait until alt:radar < ArmChute.
   print "Deploying chutes.".
-  until stage:number = 0 {
-    wait stage:ready.
+  until stage:number < 1 {
+    wait until stage:ready.
     stage.
   }
+}
+
+function shutdownCraft {
+  set throttle to 0.
+  unlock throttle.
+  unlock steering.
 }
 
 main().
