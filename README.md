@@ -19,7 +19,7 @@ Currently under development and will be used to modify the launchOrbit.ks script
 | Parameter      | Default | Description                                                                                                |
 | -------------- | -------:| ---------------------------------------------------------------------------------------------------------- |
 | TargetOrbit    | 100000  | Altitude in meters that you would like your final orbit to be                                              |
-| StartTurnAlt   | 5000    | Altitude in meters that you would like to start the ascent profile                                         |
+| StartTurnAlt   | 2000    | Altitude in meters that you would like to start the ascent profile                                         |
 | EndTurnAlt     | 70000   | Altitude in meters that you would like to end the ascent profile                                           |
 | FinalEngines   | 1       | The number of engines on your final satellite design                                                       |
 | Radial         | 90      | Radial at which you would like to point the craft for your ascent, (0 North, 90 East, 180 South, 270 West) |
@@ -42,7 +42,7 @@ Currently at this point with 2 seconds remaining to apoapsis the current apoapsi
 | Parameter         | Default | Description                                                                                           |
 | ----------------- | -------:| ----------------------------------------------------------------------------------------------------- |
 | EntrancePeriapsis | 45000   | The altitude in meters that you would like the initially periapsis to be as you enter the atmosphere. |
-| ArmChute          | 10000   | The altitude in meters at which you would like to deploy the parachutes.                              |
+| ArmChute          | 5000    | The altitude in meters at which you would like to deploy the parachutes.                              |
 
 This script makes two assumptions currently. It assumes you're not landing repulsively and that your parachutes are your final stage. First the script will orient your craft orbit:retrograde, burn until your periapsis is below the EntrancePeriapsis, stage until all engines are the craft are gone, then warp until the craft is entering the atmosphere. Next the craft will be oriented surface:retrograde, wait until the current altitude:radar is less than ArmChute, then will stage the craft until it has reached the last stage.
 
@@ -60,4 +60,4 @@ Used for launching my initial Comm Sat array. Opens terminal and runs the launch
 
 ## Todo
 
-Use Vis-Viva and Rocket Equation to better circularize orbits.
+Use all activated engines when calculating Vis-Viva

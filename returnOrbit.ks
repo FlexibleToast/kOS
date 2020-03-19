@@ -5,7 +5,7 @@
 
 Declare Parameter
 EntrancePeriapsis is 45000,
-ArmChute is          10000.
+ArmChute is           5000.
 
 function main {
   clearscreen.

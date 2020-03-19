@@ -5,7 +5,7 @@
 
 Declare Parameter
 TargetOrbit is     100000,
-StartTurnAlt is      5000,
+StartTurnAlt is      2000,
 EndTurnAlt is       70000,
 FinalEngines is         1,
 Radial is              90,
@@ -36,9 +36,9 @@ function launchCraft{
 function ascentProfile{
   // Ascent changes pitch proportianlly basen on the start:end of the turn as
   // well as the start:end of the angle of the turn.
-  // Calculate ration of current apoapsis vs starting and ending apoapsis
+  // Calculate ratio of current apoapsis vs starting and ending apoapsis
   lock turnRatio to ((apoapsis - StartTurnAlt)/(EndTurnAlt - StartTurnAlt)).
-  // Calculate ration of start vs ending angle
+  // Calculate ratio of start vs ending angle
   set angleRatio to (StartTurnAngle - EndTurnAngle).
   // Put it together and calculate pitch
   lock pitch to round((StartTurnAngle - (turnRatio*angleRatio)),0).
@@ -60,6 +60,7 @@ function ascentProfile{
   } else {
     lock steering to prograde.
   }
+  unlock pitch.
   print "Target orbit apoapsis reached".
   wait 1.
 }
@@ -77,27 +78,50 @@ function circularizeOrbit{
     stageCraft().
     list engines in craftEngines.
   }
-  // Finish coasting to apoapsis
+  // Make sure we've exited atmosphere
   if ship:altitude < 70000 {
     lock steering to srfprograde.
     wait until ship:altitude > 70000.
   }
   lock steering to prograde.
-  wait 5.
-  set warp to 3.
-  // Prepare for circularization burn
-  wait until eta:apoapsis < 40. // todo: change this to calculate actual time
-  set warp to 0.
-  wait until eta:apoapsis < 2.
-  // Begin circularization
+  // Calculate circularization burn
+  set burnTime to calcBurnTime(circDeltavCalc(apoapsis)).
+  set aTime to time:seconds + eta:apoapsis.
+  print "Caclulated dV:        " + circDeltavCalc(apoapsis).
+  print "Calculated burn time: " + burnTime.
+  // Coast to apoapsis
+  wait 10.
+  warpto(aTime - (burnTime/2 + 20)). // Warp to 20s before burn
+  wait until time:seconds > aTime - burnTime/2.
   lock throttle to 1.
-  lock steering to prograde.
-  set targetPeriapsis to apoapsis.
   print "Circularizing orbit.".
   print "Periapsis:".
-  until periapsis > (targetPeriapsis - targetPeriapsis*.03) {
-    print round(periapsis,0) at (11,2).
+  set startTime to time:seconds.
+  until time:seconds > aTime + burnTime/2 {
+    print round(periapsis,0) at (11,4).
   }
+  lock throttle to 0.
+  set endTime to time:seconds.
+  print "Actual burn time:     " + (endTime - startTime).
+}
+
+function circDeltavCalc {
+  parameter desiredOrbit.
+  local u to ship:obt:body:mu.
+  local r1 to periapsis + ship:obt:body:radius.
+  local r2 to desiredOrbit + ship:obt:body:radius.
+  return sqrt(u / r2) * (1 - sqrt((2 * r1) / (r1 + r2))).
+}
+
+function calcBurnTime {
+  parameter dV, burnAlt is apoapsis.
+  list engines in en.
+  local f is (en[0]:maxthrust * 1000).
+  local m is (ship:mass * 1000).
+  local e is constant():E.
+  local isp is en[0]:isp.
+  local g is (constant():G * ship:obt:body:mass) / (burnAlt + ship:obt:body:radius)^2.
+  return (g * m * isp * (1 - e^(-dV/(g*isp))) / f).
 }
 
 function shutdownCraft{
