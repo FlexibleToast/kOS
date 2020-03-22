@@ -99,6 +99,7 @@ function circularizeOrbit{
 }
 
 function circDeltavCalc {
+  // Use Vis-Viva equation to get required DeltaV for circulrization
   parameter desiredOrbit.
   local u to ship:obt:body:mu.
   local r1 to periapsis + ship:obt:body:radius.
@@ -107,6 +108,7 @@ function circDeltavCalc {
 }
 
 function calcBurnTime {
+  // Use Rocket Equation to find burn time for DeltaV
   parameter dV, burnAlt is apoapsis.
   local f is (calcThrust() * 1000).
   local m is (ship:mass * 1000).
@@ -117,16 +119,17 @@ function calcBurnTime {
 }
 
 function calcThrust {
+  // Sums all the thrust of the engines on the craft
   list engines in en.
   local thrust to 0.
   for engine in en { // thrustlimit, thrust,
     set thrust to (thrust + engine:availablethrust).
   }
-  print "calculated thrust: " + thrust.
   return thrust.
 }
 
 function calcISP {
+  // Calculate ISP of craft including all engines
   list engines in en.
   local ispSum to 0.
   for engine in en {
@@ -134,7 +137,6 @@ function calcISP {
       set ispSum to (ispSum + (engine:availablethrust / engine:isp)).
     }
   }
-  print "calculated ISP:    " + (calcThrust() / ispSum).
   return (calcThrust() / ispSum).
 }
 
