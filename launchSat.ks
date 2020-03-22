@@ -115,13 +115,34 @@ function circDeltavCalc {
 
 function calcBurnTime {
   parameter dV, burnAlt is apoapsis.
-  list engines in en.
-  local f is (en[0]:maxthrust * 1000).
+  local f is (calcThrust() * 1000).
   local m is (ship:mass * 1000).
   local e is constant():E.
-  local isp is en[0]:isp.
+  local isp is calcISP().
   local g is (constant():G * ship:obt:body:mass) / (burnAlt + ship:obt:body:radius)^2.
   return (g * m * isp * (1 - e^(-dV/(g*isp))) / f).
+}
+
+function calcThrust {
+  list engines in en.
+  local thrust to 0.
+  for engine in en { // thrustlimit, thrust,
+    set thrust to (thrust + engine:availablethrust).
+  }
+  print "calculated thrust: " + thrust.
+  return thrust.
+}
+
+function calcISP {
+  list engines in en.
+  local ispSum to 0.
+  for engine in en {
+    if engine:isp > 0 {
+      set ispSum to (ispSum + (engine:availablethrust / engine:isp)).
+    }
+  }
+  print "calculated ISP:    " + (calcThrust() / ispSum).
+  return (calcThrust() / ispSum).
 }
 
 function shutdownCraft{
